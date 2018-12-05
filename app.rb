@@ -53,10 +53,14 @@ get '/images/:resource/:id/upload' do
 end
 
 post '/images/:resource/:id/upload' do
-  tempfile = params[:file][:tempfile] 
-  filename = params[:file][:filename] 
-  target_dir = File.join(settings.images_dir, "/#{params[:resource]}/#{params[:id]}") if settings.resources.include?(params[:resource])
-  FileUtils.mkdir_p(target_dir) unless File.exists?(target_dir)
-  FileUtils.cp(tempfile.path, File.join(target_dir, "/#{filename}"))
-  { message: 'Готово!' }.to_json
+  if params[:file]
+    tempfile = params[:file][:tempfile] 
+    filename = params[:file][:filename] 
+    target_dir = File.join(settings.images_dir, "/#{params[:resource]}/#{params[:id]}") if settings.resources.include?(params[:resource])
+    FileUtils.mkdir_p(target_dir) unless File.exists?(target_dir)
+    FileUtils.cp(tempfile.path, File.join(target_dir, "/#{filename}"))
+    { message: 'Готово!' }.to_json
+  else
+    { error: 'Файл не выбран!' }.to_json
+  end
 end

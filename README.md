@@ -19,7 +19,7 @@ set :resources, [ 'models', 'vehicles' ]	# ресурсы для которых 
 ```
 ```
 # config/puma.rb
-DAEMON=yes	# running as daemon
+DAEMON=yes	# run as daemon
 PORT=3333	# tcp/ip port binding
 ```
 ## Загрузка картинок (role: admin):
