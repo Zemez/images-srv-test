@@ -6,16 +6,16 @@ Image tools microservice:
 ```
 # .env
 DATABASE_HOSTNAME=localhost	# db hostname (optional)
-DATABASE_PORT=5432			    # db port (optional)
+DATABASE_PORT=5432		# db port (optional)
 DATABASE_USERNAME=username	# db username (optional if connect through socket/peer)
-DATABASE_PASSWORD=secret123 # db password (optional if connect through socket/peer)
-DATABASE_NAME=dbname 		    # db name
+DATABASE_PASSWORD=secret123	# db password (optional if connect through socket/peer)
+DATABASE_NAME=dbname		# db name
 
 PUBLIC_DIR=/var/www/public 	# общедоступная папка для хранения картинок
 ```
 ```
 # config/app.rb
-set :resources, [ 'models', 'vehicles' ] # ресурсы для которых будут храниться картинки
+set :resources, [ 'models', 'vehicles' ]	# ресурсы для которых будут храниться картинки
 ```
 ```
 # config/puma.rb
