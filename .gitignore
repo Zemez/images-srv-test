@@ -1,3 +1,11 @@
+# See https://help.github.com/articles/ignoring-files for more about ignoring files.
+
+# Ignore all logfiles and tempfiles.
+/log/*
+/tmp/*
+!/log/.keep
+!/tmp/.keep
+
 *.gem
 *.rbc
 /.config
@@ -8,10 +16,9 @@
 /spec/examples.txt
 /test/tmp/
 /test/version_tmp/
-/tmp/
 
 # Used by dotenv library to load environment variables.
-# .env
+.env
 
 ## Specific to RubyMotion:
 .dat*
