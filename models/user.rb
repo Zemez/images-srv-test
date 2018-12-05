@@ -9,4 +9,6 @@ class User
   property :id, Serial, key: true
   property :email, String
   property :role, String
+
+  has n, :authentication_tokens
 end

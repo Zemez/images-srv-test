@@ -9,6 +9,7 @@ require 'fileutils'
 #
 require_relative 'config/app'
 require_relative 'models/user'
+require_relative 'models/authentication_token'
 #
 # include FileUtils::Verbose
 get '/' do
@@ -17,8 +18,19 @@ end
 
 get '/users' do
   users = User.all
+  logger.info '#' * 80
+  logger.info users.map { |u| u.as_json }
+  logger.info '#' * 80
   # Yajl::Encoder.encode(users)
   users.to_json
+end
+
+get '/tokens' do
+  users = User.all
+  user_tokens = users.map do |user|
+    user.as_json.merge(tokens: user.authentication_tokens)
+  end
+  user_tokens.to_json
 end
 
 # вывести весь список картинок
@@ -46,5 +58,5 @@ post '/images/:resource/:id/upload' do
   target_dir = File.join(settings.images_dir, "/#{params[:resource]}/#{params[:id]}") if settings.resources.include?(params[:resource])
   FileUtils.mkdir_p(target_dir) unless File.exists?(target_dir)
   FileUtils.cp(tempfile.path, File.join(target_dir, "/#{filename}"))
-  'Готово!'
+  { message: 'Готово!' }.to_json
 end
