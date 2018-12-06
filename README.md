@@ -5,7 +5,7 @@ Image tools microservice:
 
 ```
 # .env
-PUBLIC_DIR=/var/www/public		# общедоступная папка для хранения картинок
+PUBLIC_DIR=/var/www/public	# общедоступная папка для хранения картинок
 BACK_HOST=http://localhost:3000	# URL бэкенда с аутентификацией
 DAEMON=yes	# run as daemon
 PORT=3333	# tcp/ip port binding
