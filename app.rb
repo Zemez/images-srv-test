@@ -3,34 +3,22 @@ require 'rubygems'
 require 'bundler/setup' # If you're using bundler, you will need to add this
 require 'dotenv/load'
 require 'sinatra'
-require 'data_mapper' # requires all the gems listed above
-require 'yajl'
+require 'sinatra/json'
 require 'fileutils'
+require 'faraday'
 #
 require_relative 'config/app'
-require_relative 'models/user'
-require_relative 'models/authentication_token'
 #
 # include FileUtils::Verbose
+
+# проверка аутентификации (авторизации)
+before do 
+  auth!
+end
+
+# редикерт на картинки
 get '/' do
   redirect to('/images')
-end
-
-get '/users' do
-  users = User.all
-  logger.info '#' * 80
-  logger.info users.map { |u| u.as_json }
-  logger.info '#' * 80
-  # Yajl::Encoder.encode(users)
-  users.to_json
-end
-
-get '/tokens' do
-  users = User.all
-  user_tokens = users.map do |user|
-    user.as_json.merge(tokens: user.authentication_tokens)
-  end
-  user_tokens.to_json
 end
 
 # вывести весь список картинок
@@ -45,22 +33,46 @@ get '/images' do
       image_path: image_path
     }
   end
-  images.to_json
+  json images
 end
 
+# простенькая форма загрузки
 get '/images/:resource/:id/upload' do
   erb :upload, locals: { action: "/images/#{params[:resource]}/#{params[:id]}/upload" }
 end
 
+# обработка загрузки
 post '/images/:resource/:id/upload' do
   if params[:file]
     tempfile = params[:file][:tempfile] 
     filename = params[:file][:filename] 
     target_dir = File.join(settings.images_dir, "/#{params[:resource]}/#{params[:id]}") if settings.resources.include?(params[:resource])
     FileUtils.mkdir_p(target_dir) unless File.exists?(target_dir)
-    FileUtils.cp(tempfile.path, File.join(target_dir, "/#{filename}"))
-    { message: 'Готово!' }.to_json
+    target_file = File.join(target_dir, "/#{filename}")
+    FileUtils.cp(tempfile.path, target_file)
+    File.chmod(0644, target_file) # чтоб можно было выдавать картинки через nginx
+    json message: 'Готово!'
   else
-    { error: 'Файл не выбран!' }.to_json
+    json error: 'Файл не выбран!', status: :unprocessable_entity
   end
+end
+
+# проверяем токен на главном бэкенде
+def auth!
+  result = nil
+  email = request.env['HTTP_X_USER_EMAIL']
+  token = request.env['HTTP_X_USER_TOKEN']
+  if email && token
+    result = Faraday.get do |req|
+      req.url "#{settings.back_host}/auth/check"
+      req.headers['Content-Type'] = 'application/json'
+      req.headers['X-USER-EMAIL'] = email
+      req.headers['X-USER-TOKEN'] = token
+    end
+  end
+  user = JSON.parse(result.body, { symbolize_names: true })[:user] if result && result.success?
+  # logger.info '#' * 80
+  # logger.info user
+  # logger.info '#' * 80
+  halt 401, { error: 'Недействительный токен и/или отсутствуют права доступа.' }.to_json unless result && result.success? # && user[:role] == 'admin'
 end

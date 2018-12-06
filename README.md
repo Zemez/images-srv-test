@@ -5,30 +5,22 @@ Image tools microservice:
 
 ```
 # .env
-DATABASE_HOSTNAME=localhost	# db hostname (optional)
-DATABASE_PORT=5432		# db port (optional)
-DATABASE_USERNAME=username	# db username (optional if connect through socket/peer)
-DATABASE_PASSWORD=secret123	# db password (optional if connect through socket/peer)
-DATABASE_NAME=dbname		# db name
-
-PUBLIC_DIR=/var/www/public 	# общедоступная папка для хранения картинок
+PUBLIC_DIR=/var/www/public		# общедоступная папка для хранения картинок
+BACK_HOST=http://localhost:3000	# URL бэкенда с аутентификацией
+DAEMON=yes	# run as daemon
+PORT=3333	# tcp/ip port binding
 ```
 ```
 # config/app.rb
 set :resources, [ 'models', 'vehicles' ]	# ресурсы для которых будут храниться картинки
 ```
-```
-# config/puma.rb
-DAEMON=yes	# run as daemon
-PORT=3333	# tcp/ip port binding
-```
 ## Загрузка картинок (role: admin):
 
-POST запросом отправляем форму с action:
+POST запросом отправлять форму с action:
 ```
 http://<hostname>/images/<resource>/<id>/upload
 ```
-Так же есть простенькая форма через GET запрос
+Так же есть простенькая форма для тестов через GET запрос
 
 ## Список всех картинок на сервере (role: admin):
 
